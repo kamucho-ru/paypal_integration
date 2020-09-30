@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+<script type="application/javascript">
+$(document).ready(function(){
+    var price, msg, value, text;
+    var select = $('#id_priority');
+    var old_val = select.val();
+
+    select.change(function(){
+        value = $(this).children("option:selected").val();
+        text = $(this).children("option:selected").text();
+
+        if (['H', 'U'].indexOf(value) >= 0)
+        {
+            if (value == 'H')
+                price = 5;
+            else
+                price = 10;
+            msg = 'Its '+text+' ticket '+price+'$ has to pay . Do you want to continue?';
+
+            if (!confirm(msg))
+            {
+                $(this).val(old_val);
+                return false;
+            }
+        }
+        old_val = value;
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<h1 class="text-uppercase text-center">
+    {% if object %}Edit
+    {% else %}New
+    {% endif %}
+    ticket</h1>
+<form method="post">
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+{{ form.as_p }}
+<button type="submit">
+    {% if object %}Save
+    {% else %}Create
+    {% endif %}
+</button>
+</form>
+{% endblock %}

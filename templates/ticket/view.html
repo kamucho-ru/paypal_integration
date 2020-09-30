@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ ticket.title }}</h1>
+    <i>{{ ticket.user }}</i> /
+    {{ ticket.get_priority_display }} /
+    {{ ticket.get_ticket_type_display }}
+<pre>
+{{ ticket.content }}
+</pre>
+{% endblock %}

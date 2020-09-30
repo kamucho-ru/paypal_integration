@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if tickets %}
+    <table border="1">
+        <tr>
+            <td>id</td>
+            <td>user</td>
+            <td>title</td>
+            <td>type</td>
+            <td>priority</td>
+        </tr>
+    {% for t in tickets %}
+        <tr>
+            <td>{{ t.id }}</td>
+            <td>{{ t.user }}</td>
+            <td>
+                <a href="{% url 'ticket_detail' t.slug %}">
+                    {{ t.title }}
+                </a>
+            </td>
+            <td>{{ t.get_ticket_type_display }}</td>
+            <td>{{ t.get_priority_display }}</td>
+            {% if user == t.user %}
+            <td>
+                <a href="{% url 'ticket_edit' t.slug %}">edit</a>
+                {% if 'P' in t.priority %}
+                    or
+                    <a href="{% url 'ticket_pay' t.slug %}">pay</a>
+                {% endif %}
+            </td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </table>
+{% endif %}
+{% endblock %}
