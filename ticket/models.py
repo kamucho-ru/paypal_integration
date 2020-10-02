@@ -56,5 +56,5 @@ class Ticket(models.Model):
 class Order(models.Model):
     payment_id = models.CharField(max_length=1000)
     payment_email = models.EmailField()
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='orders')
     amount = models.DecimalField(max_digits=6, decimal_places=2)

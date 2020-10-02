@@ -51,6 +51,7 @@ class PayTicket(LoginRequiredMixin, BaseDetailView, TemplateResponseMixin):
         else:
             return redirect(self.object.get_absolute_url())
 
+        Order.objects.filter(ticket=self.object, payment_id__isnull=True).delete()
         order = Order(ticket=self.object, amount=price)
         order.save()
 
@@ -91,11 +92,13 @@ class CreateTicket(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         self.object = form.save()
         self.object.user = self.request.user
 
-        if self.object.priority == Ticket.PRIORITY_HIGH:
-            self.object.priority = Ticket.PRIORITY_HIGH_PENDING
+        ticket_paid = self.object.orders.filter(payment_id__isnull=False).exists()
+        if not ticket_paid:
+            if self.object.priority == Ticket.PRIORITY_HIGH:
+                self.object.priority = Ticket.PRIORITY_HIGH_PENDING
 
-        elif self.object.priority == Ticket.PRIORITY_URGENT:
-            self.object.priority = Ticket.PRIORITY_URGENT_PENDING
+            elif self.object.priority == Ticket.PRIORITY_URGENT:
+                self.object.priority = Ticket.PRIORITY_URGENT_PENDING
 
         # do something with self.object
         # remember the import: from django.http import HttpResponseRedirect
