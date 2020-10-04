@@ -35,9 +35,13 @@ def handle_payment(sender, **kwargs):
         order.save()
 
         ticket = order.ticket
-
         ticket.priority = ticket.priority[0]
         ticket.save()
+
+        user = ticket.user
+        if not user.paypal_account:
+            user.paypal_account = ipn_obj.payer_email
+            user.save(update_fields=['paypal_account'])
     else:
         pass
         # handle other status
