@@ -1,6 +1,7 @@
 from user.models import get_current_user
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
@@ -55,6 +56,18 @@ class ViewTicket(LoginRequiredMixin, BaseDetailView, TemplateResponseMixin):
             reply.ticket = self.object
             reply.user = get_current_user()
             reply.save()
+            if not reply.user.paypal_account:
+                # One way - redirect user to edit profile page
+                # messages.info(self.request, 'You should fill your paypal account.')
+                # return redirect('profile')
+
+                # another - show message with link to page.
+                messages.info(
+                    self.request,
+                    'You should fill your <a href="{}">paypal account</a>.'.
+                    format(reverse('profile')),
+                    extra_tags='safe'
+                )
             return redirect('ticket_detail', self.object.slug)
         return self.render_to_response(context)
 

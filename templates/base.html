@@ -25,7 +25,7 @@
 {% if messages %}
     <br>
     {% for m in messages %}
-        {{ m }}<br>
+        {% if 'safe' in m.tags %}{{ m|safe }}{% else %}{{ m }}{% endif %}<br>
     {% endfor %}
 {% endif %}
 </div>
