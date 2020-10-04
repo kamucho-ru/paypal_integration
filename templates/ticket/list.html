@@ -7,6 +7,7 @@
             <td>id</td>
             <td>user</td>
             <td>title</td>
+            <td>answers</td>
             <td>type</td>
             <td>priority</td>
         </tr>
@@ -19,6 +20,7 @@
                     {{ t.title }}
                 </a>
             </td>
+            <td>{{ t.replies.count }}</td>
             <td>{{ t.get_ticket_type_display }}</td>
             <td>{{ t.get_priority_display }}</td>
             {% if user == t.user %}

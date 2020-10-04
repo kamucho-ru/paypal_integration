@@ -58,3 +58,9 @@ class Order(models.Model):
     payment_email = models.EmailField()
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='orders')
     amount = models.DecimalField(max_digits=6, decimal_places=2)
+
+
+class Reply(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='replies')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    text = models.CharField(max_length=5000)

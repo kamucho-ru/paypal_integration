@@ -1,3 +1,5 @@
+from user.models import get_current_user
+
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -8,7 +10,7 @@ from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import BaseDetailView
 from paypal.standard.forms import PayPalPaymentsForm
 
-from ticket.forms import TicketForm
+from ticket.forms import ReplyForm, TicketForm
 from ticket.models import Order, Ticket
 
 
@@ -31,6 +33,30 @@ class ViewTicket(LoginRequiredMixin, BaseDetailView, TemplateResponseMixin):
     model = Ticket
     template_name = 'ticket/view.html'
     slug_field = 'slug'
+
+    def get(self, request, *args, **kwargs):
+        reply_form = ReplyForm()
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        context.update({
+            'reply_form': reply_form,
+        })
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        reply_form = ReplyForm(data=request.POST)
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        context.update({
+            'reply_form': reply_form,
+        })
+        if reply_form.is_valid():
+            reply = reply_form.save(commit=False)
+            reply.ticket = self.object
+            reply.user = get_current_user()
+            reply.save()
+            return redirect('ticket_detail', self.object.slug)
+        return self.render_to_response(context)
 
 
 class PayTicket(LoginRequiredMixin, BaseDetailView, TemplateResponseMixin):

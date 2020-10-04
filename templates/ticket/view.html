@@ -8,4 +8,17 @@
 <pre>
 {{ ticket.content }}
 </pre>
+
+{% if ticket.replies.exists %}
+    <h2>Replies</h2>
+    {% for r in ticket.replies.all %}
+        <b>{{ r.user }}</b>: {{ r.text }}<br>
+    {% endfor %}
+{% endif %}
+
+<h3>Reply</h3>
+<form method="post">
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+{{ reply_form.as_p }}
+<input type="submit" value="reply">
 {% endblock %}
