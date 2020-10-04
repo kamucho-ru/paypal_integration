@@ -14,7 +14,7 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('first_name', 'email')
+        fields = ('first_name', 'email', 'paypal_account')
 
 
 class JoinForm(UserCreationForm):
