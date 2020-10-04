@@ -1,3 +1,5 @@
+from django.contrib import messages
+
 from user.forms import JoinForm, ProfileForm
 
 from django.contrib.auth import authenticate, login
@@ -27,6 +29,9 @@ class LoginView(DefaultLoginView):
             if authenticate(username=form.cleaned_data["username"],
                             password=form.cleaned_data["password"]):
                 login(request, user)
+            if not user.paypal_account:
+                messages.info(self.request, 'You should fill your paypal account.')
+                return redirect('profile')
             return redirect('index')
         context.update({
             'title': 'login',
