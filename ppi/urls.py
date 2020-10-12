@@ -29,6 +29,8 @@ urlpatterns = [
     url(r'^paypal/', include('paypal.standard.ipn.urls')),
 
     path('admin/', admin.site.urls),
+
+    path('ws/notifs/confirm/', ticket_views.ConfirmNotification.as_view(), name='index'),
 ]
 
 

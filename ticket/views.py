@@ -1,18 +1,66 @@
+import json
 from user.models import get_current_user
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView, TemplateView, UpdateView
-from django.views.generic.base import TemplateResponseMixin
+from django.views.generic.base import TemplateResponseMixin, View
 from django.views.generic.detail import BaseDetailView
 from paypal.standard.forms import PayPalPaymentsForm
 
 from ticket.forms import ReplyForm, TicketForm
-from ticket.models import Order, Ticket
+from ticket.models import Order, ReplyNotification, Ticket
+
+
+# hook for accepring notification readed confirmation
+# when receive - delete notification
+# otherwise, we should notify user somehow else
+class ConfirmNotification(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ConfirmNotification, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        body = json.loads(request.body)
+        ReplyNotification.objects.filter(
+            pk=body['notification_id'], user=request.user
+        ).delete()
+        return HttpResponse('OK')
+
+
+# this function used for saving notification in database
+# can be called from any place, where reply created.
+def save_notification(ticket=None, reply=None):
+    notification = ReplyNotification()
+    if ticket:
+        notification.ticket = ticket
+        notification.user = ticket.user
+    if reply:
+        notification.reply = reply
+        notification.user = reply.user
+    notification.save()
+
+    channel_layer = get_channel_layer()
+    data = "You got answer for you ticket/reply!"
+    # Trigger message sent to user
+    async_to_sync(channel_layer.group_send)(
+        str(notification.user.pk),  # Group Name, Should always be string
+        {
+            "type": "notify",   # Custom Function written in the channels.py
+            "text": data,
+            "notification_id": notification.pk
+        },
+    )
 
 
 class Tickets(TemplateView):
@@ -56,6 +104,7 @@ class ViewTicket(LoginRequiredMixin, BaseDetailView, TemplateResponseMixin):
             reply.ticket = self.object
             reply.user = get_current_user()
             reply.save()
+            save_notification(ticket=self.object)
             if not reply.user.paypal_account:
                 # One way - redirect user to edit profile page
                 # messages.info(self.request, 'You should fill your paypal account.')

@@ -36,11 +36,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'channels',
     'ticket.apps.TicketConfig',
     'user.apps.UserConfig',
     'paypal.standard.ipn',
 ]
+
+ASGI_APPLICATION = 'ticket.channels.application'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -110,3 +113,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}

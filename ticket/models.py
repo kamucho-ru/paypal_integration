@@ -64,3 +64,9 @@ class Reply(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='replies')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     text = models.CharField(max_length=5000)
+
+
+class ReplyNotification(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, null=True)
+    reply = models.ForeignKey(Reply, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
