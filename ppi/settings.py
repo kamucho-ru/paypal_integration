@@ -12,7 +12,23 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 
-from .settings_local import *  # NOQA
+####### L o c a l   s e t t i n g s ################################
+
+import dj_database_url
+
+DEBUG = os.environ.get('DEBUG_VALUE')
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
+PAYPAL_TEST = False
+PAYPAL_PREFIX = os.environ.get('PAYPAL_PREFIX')
+PAYPAL_ACCOUNT = os.environ.get('PAYPAL_ACCOUNT')
+PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID')
+PAYPAL_SECRET = os.environ.get('PAYPAL_SECRET')
+
+ALLOWED_HOSTS = ['*']
+
+DATABASES = {'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))}
+####################################################################
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -112,13 +128,23 @@ USE_TZ = True
 # staticfiles
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
         },
     },
 }
+
+
+
+### More Local settings
+import django_heroku
+django_heroku.settings(locals())
+

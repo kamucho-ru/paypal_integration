@@ -11,7 +11,7 @@ class MessageConsumer(WebsocketConsumer):
 
     def connect(self):
         # Checking if the User is logged in
-        if self.scope["user"].is_anonymous:
+        if 'user' in self.scope and self.scope["user"].is_anonymous:
             # Reject the connection
             self.close()
         else:
@@ -46,7 +46,7 @@ application = ProtocolTypeRouter({
     # (http->django views is added by default)
     'websocket': AuthMiddlewareStack(
         URLRouter(
-            [re_path(r'ws/notifs/$', MessageConsumer)]
+            [re_path(r'^ws/notifs/$', MessageConsumer)]
         )
     ),
 })

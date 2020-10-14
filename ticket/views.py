@@ -21,6 +21,10 @@ from ticket.forms import ReplyForm, TicketForm
 from ticket.models import Order, ReplyNotification, Ticket
 
 
+class Index(TemplateView):
+    template_name = 'base.html'
+
+
 # hook for accepring notification readed confirmation
 # when receive - delete notification
 # otherwise, we should notify user somehow else
@@ -104,7 +108,18 @@ class ViewTicket(LoginRequiredMixin, BaseDetailView, TemplateResponseMixin):
             reply.ticket = self.object
             reply.user = get_current_user()
             reply.save()
-            save_notification(ticket=self.object)
+
+            # to prevent multinotifications for one user
+            users = []
+            if reply.user != self.object.user:
+                users.append(self.object.user)
+                save_notification(ticket=self.object)
+
+            for r in self.object.replies.exclude(user=reply.user):
+                if r.user not in users:
+                    users.append(r.user)
+                    save_notification(reply=r)
+
             if not reply.user.paypal_account:
                 # One way - redirect user to edit profile page
                 # messages.info(self.request, 'You should fill your paypal account.')

@@ -10,7 +10,7 @@ from django.urls import include, path
 from ticket import views as ticket_views
 
 urlpatterns = [
-    path('', ticket_views.Tickets.as_view(), name='index'),
+    path('', ticket_views.Index.as_view(), name='index'),
 
     path('login/', user_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
@@ -30,7 +30,7 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
 
-    path('ws/notifs/confirm/', ticket_views.ConfirmNotification.as_view(), name='index'),
+    path('ws/notifs/confirm/', ticket_views.ConfirmNotification.as_view(), name='ws-confirmation'),
 ]
 
 
