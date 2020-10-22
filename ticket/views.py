@@ -196,3 +196,28 @@ class CreateTicket(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
 class UpdateTicket(CreateTicket, UpdateView):
     pass
+
+
+class SubDomainIndex(TemplateView):
+    template_name = 'ticket/list.html'
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        title = 'subdomain tickets'
+
+        # get subdomain and filter tickets
+        subdomain = request.META['HTTP_HOST'].split('.', 1)[0]
+        print(subdomain)
+        tickets = Ticket.objects.filter(
+            ticket_type=subdomain[0].upper()
+        )
+
+        context.update({
+            'tickets': tickets,
+            'title': title
+        })
+        return self.render_to_response(context)
+
+
+class CustomIndex(TemplateView):
+    template_name = 'page.html'

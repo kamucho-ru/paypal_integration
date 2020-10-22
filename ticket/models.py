@@ -2,7 +2,7 @@ from user.models import User
 
 from django.db import models
 from django.template.defaultfilters import slugify
-from django.urls import reverse
+from django_hosts.resolvers import reverse
 
 
 class Ticket(models.Model):
@@ -51,6 +51,12 @@ class Ticket(models.Model):
                 slug = '{}_{}'.format(slug, 'copy')  # fixme
             self.slug = slug
         return super().save(*args, **kwargs)
+
+    def get_subdomain(self):
+        return reverse(
+            'index', host='dynamic',
+            host_args=(self.get_ticket_type_display().lower(), )
+        )
 
 
 class Order(models.Model):

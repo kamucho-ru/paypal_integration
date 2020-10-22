@@ -21,7 +21,13 @@
                 </a>
             </td>
             <td>{{ t.replies.count }}</td>
-            <td>{{ t.get_ticket_type_display }}</td>
+            <td>
+                {% if t.ticket_type %}
+                    <a href="{{ t.get_subdomain }}">
+                        {{ t.get_ticket_type_display }}
+                    </a>
+                {% endif %}
+            </td>
             <td>{{ t.get_priority_display }}</td>
             {% if user == t.user %}
             <td>

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'channels',
+    'django_hosts',
     'ticket.apps.TicketConfig',
     'user.apps.UserConfig',
     'paypal.standard.ipn',
@@ -46,6 +47,7 @@ ASGI_APPLICATION = 'ticket.channels.application'
 
 
 MIDDLEWARE = [
+    'django_hosts.middleware.HostsRequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,9 +55,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_hosts.middleware.HostsResponseMiddleware',
 ]
 
+
 ROOT_URLCONF = 'ppi.urls'
+DEFAULT_HOST = 'www'
+ROOT_HOSTCONF = 'ppi.hosts'
+PARENT_HOST = 'example.com:8000'
+SESSION_COOKIE_DOMAIN = 'example.com'
+SESSION_COOKIE_NAME = 'sharesession'
+
 
 TEMPLATES = [
     {
@@ -68,6 +78,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+            ],
+            'builtins': [
+                'django_hosts.templatetags.hosts_override'
             ],
         },
     },

@@ -30,7 +30,7 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
 
-    path('ws/notifs/confirm/', ticket_views.ConfirmNotification.as_view(), name='index'),
+    path('ws/notifs/confirm/', ticket_views.ConfirmNotification.as_view(), name='confirm-notify'),
 ]
 
 
